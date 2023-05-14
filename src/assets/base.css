@@ -1,0 +1,10 @@
+@font-face {
+    font-family: "JetBrains Mono Nerd Font Mono Medium";
+    src: url("fonts/JetBrainsMonoNerdFontMono-Medium.ttf");
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: "JetBrains Mono Nerd Font Mono Medium";
+}

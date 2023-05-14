@@ -1,0 +1,190 @@
+#!/usr/bin/python
+import toml
+import os
+import argparse
+import sys
+import subprocess
+import shutil
+from prompt_toolkit import prompt
+
+class Base(object):
+    """基础配置类"""
+    allowed_origins: list[str]
+    server_port: int
+    server_host: str | None
+    frontend_host: str
+    frontend_port: int | None
+    gin_mode: str
+
+class Config(object):
+    """配置类"""
+    base: Base
+    def __init__(self, file_path: str) -> None:
+        self.base = Base()
+        # 如果配置文件不存在，或者不是文件，则创建
+        if os.path.exists(file_path) == False or os.path.isfile(file_path) == False:
+            init_config(file_path)
+            exit()
+        # 加载配置文件
+        config = toml.load(file_path)
+        self.base.allowed_origins = config.get('base').get('allowed_origins')
+        self.base.gin_mode = config.get('base').get('gin_mode')
+        self.base.server_port = config.get('base').get('server_port')
+        self.base.server_host = config.get('base').get('server_host')
+        self.base.frontend_host = config.get('base').get('frontend_host')
+        self.base.frontend_port = config.get('base').get('frontend_port')
+        # 如果是空，则给定默认值
+        if self.base.server_host == None:
+            self.base.server_host = ''
+        if self.base.server_port== None:
+            self.base.server_port = 8000
+        if self.base.gin_mode == None:
+            self.base.gin_mode = 'debug'
+        # 如果前端地址和ip不存在，则报错
+        if self.base.frontend_host == None:
+            sys.stderr.write('请给base.frontend_host赋值\n')
+            exit()
+        if self.base.frontend_port == None:
+            sys.stderr.write('请给base.frontend_port赋值\n')
+        # 如果前端地址不在base.frontend_port中，则报错
+        if ((f'http://{self.base.frontend_host}:{self.base.frontend_port}' not in self.base.allowed_origins)
+            and (f'https://{self.base.frontend_host}:{self.base.frontend_port}' not in self.base.allowed_origins)
+            and (f'http://{self.base.frontend_host}' not in self.base.allowed_origins)
+            and (f'https://{self.base.frontend_host}' not in self.base.allowed_origins)):
+            sys.stderr.write('请确认前端的根地址是否在base.allowed_origins中\n')
+            exit()
+
+def init_config(file_path: str) -> Base:
+    """初始化配置
+
+    arguments:
+        file_path: str 文件路径
+    """
+    base = Base()
+    ## 请求用户输入信息
+    base.server_host = prompt('请输入服务端主机地址(默认为空，表示127.0.0.1): ')
+    base.server_port = prompt('请输入服务端主机端口(默认为8000): ')
+    base.gin_mode = prompt('请输入服务端程序运行的模式(debug或者release)(默认debug): ')
+    base.frontend_host = prompt('请输入前端服务地址(默认为127.0.0.1): ')
+    base.frontend_port = prompt('请输入前端服务端口(默认为8080): ')
+    # 取gin_mode默认值
+    if str(base.gin_mode).strip() == '':
+        base.gin_mode = 'debug'
+    # 取server_port的值
+    if str(base.server_port).strip() == '':
+        base.server_port = 8000
+    else:
+        base.server_port = int(base.server_port)
+    # 取frontend_host的值
+    if str(base.frontend_host).strip() == '':
+        base.frontend_host = '127.0.0.1'
+    # 取frontend_port的值
+    if str(base.frontend_port).strip() == '':
+        base.frontend_port = 8080
+    else:
+        base.frontend_host = int(base.server_port)
+    # 写入配置文件
+    with open(file_path, "w") as f:
+        f.write(f"""[base]
+allowed_origins = []
+server_host = "{base.server_host}"
+server_port = {base.server_port}
+gin_mode = "{base.gin_mode}"
+frontend_host = "{base.frontend_host}"
+frontend_port = {base.frontend_port}
+""")
+    print(f'初始化配置文件以保存至{file_path}，请编辑{file_path}文件，需要配置base.allowed_origins项')
+    return base
+
+def build_project(file_path: str):
+    """构建项目"""
+    config = Config(file_path)
+    write_config(config)
+    run_command()
+    make_package()
+
+def run_command():
+    """执行命令"""
+    # 构建前端
+    if not os.path.exists("dist/index.html"):
+        frontend_build_tool = str(prompt('请输入构建工具(yarn,npm,pnpm): ')).strip()
+        if frontend_build_tool != "npm" and frontend_build_tool != "pnpm" and frontend_build_tool != "yarn":
+            sys.stderr.write('请输入三者其中之一\n')
+        elif frontend_build_tool == "npm":
+            subprocess.run("npm install", shell=True)
+            subprocess.run("npm run build", shell=True)
+        elif frontend_build_tool == "pnpm":
+            subprocess.run("pnpm install", shell=True)
+            subprocess.run("pnpmbuild", shell=True)
+        elif frontend_build_tool == "yarn":
+            subprocess.run("yarn", shell=True)
+            subprocess.run("yarn run build", shell=True)
+    print("前端构建完成")
+    # 构建后端
+    subprocess.run("go mod tidy", cwd="backend", shell=True)
+    subprocess.run("go build", cwd="backend", shell=True)
+    print("后端构建完成")
+
+def make_package():
+    """打包"""
+    backend_folder = os.path.exists("bin/backend")
+    if not backend_folder:
+        os.makedirs("bin/backend")
+        print("创建文件夹bin/backend完成")
+    frontend_folder = os.path.exists("bin/frontend")
+    if not frontend_folder:
+        os.makedirs("bin/frontend")
+        print("创建文件夹bin/frotend完成")
+    subprocess.run("cp -rf dist/* bin/frontend", shell=True)
+    print("前端文件成功拷贝至bin/frontend")
+    subprocess.run("cp -f backend/config.toml bin/backend", shell=True)
+    print("后端配置文件`config.toml`成功拷贝至bin/frontend/config.toml")
+    subprocess.run("cp -f backend/backend bin/backend/backend", shell=True)
+    print("后端可执程序`config.toml`成功拷贝至bin/frontend/frontend")
+    
+
+def write_config(config: Config):
+    """写入配置文件"""
+    with open("src/utils/baseurl.ts", "w", encoding="utf-8") as f:
+        if config.base.server_host == '':
+            config.base.server_host = '127.0.0.1'
+        f.write(f'export const backendUrl = "http://{config.base.server_host}:{config.base.server_port}"')
+        f.close()
+    with open("backend/config.toml", "w", encoding="utf-8") as f:
+        allowed_origins = ""
+        index = 0
+        for allowed_origin in config.base.allowed_origins:
+            if index != len(config.base.allowed_origins) - 1:
+                allowed_origins += f'"{allowed_origin}", '
+            else:
+                allowed_origins += f'"{allowed_origin}"'
+            index += 1
+        content = f"""[base]
+allowed_origins = [{allowed_origins}]
+server_host = "{config.base.server_host}"
+server_port = {config.base.server_port}
+gin_mode = "{config.base.gin_mode}"
+"""
+        f.write(content)
+        f.close()
+
+def main() -> None:
+    """主函数"""
+    config_file_path = "config.toml"
+    # 命令解析工具
+    parser = argparse.ArgumentParser(prog="build", description="Building the project")
+
+    # 参数
+    parser.add_argument("--init", help="Initialize the 'config.toml' configuration file", action='store_true')
+    parser.add_argument("--build", help="Build the project", action='store_true', default=True)
+
+    # 解析
+    args = parser.parse_args()
+    if args.init:
+        init_config(config_file_path)
+    else:
+        if args.build:
+            build_project(config_file_path)
+
+if __name__ == '__main__':
+    main()
