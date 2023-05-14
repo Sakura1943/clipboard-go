@@ -11,7 +11,7 @@ class Config(object):
     """配置类"""
     def __init__(self, file_path):
         # 如果配置文件不存在，或者不是文件，则创建
-        if os.path.exists(file_path) == False or os.path.isfile(file_path) == False:
+        if not os.path.exists(file_path) or not os.path.isfile(file_path):
             init_config(file_path)
             exit()
         # 加载配置文件
