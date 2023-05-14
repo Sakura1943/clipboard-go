@@ -1,0 +1,8 @@
+node_modules/
+.vscode/
+backend/backend
+backend/go.sum
+
+yarn.lock
+
+dist/
