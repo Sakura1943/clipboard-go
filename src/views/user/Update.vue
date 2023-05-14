@@ -169,9 +169,9 @@ const _updateUser = debounce(function (_: number, row: {
 const sendUpdate = () => {
     // 如果当前用户为管理员且更新的用户也是管理员，并且修改其权限，则提示不允许操作
     if (localStorage.getItem('user') === 'admin' && ruleForm.name === 'admin' && ruleForm.permission == 'custom') {
-        ElMessageBox.alert(_messageBoxItems.notAllowedChangePermission.alert?.error?.message, _messageBoxItems.notAllowedChangePermission.alert?.error?.title, {
-            confirmButtonText: _messageBoxItems.notAllowedChangePermission.alert?.error?.confirmButtonText,
-            type: _messageBoxItems.notAllowedChangePermission.alert?.error?.type
+        ElMessageBox.alert(_messageBoxItems.notAllowedChangePermission.alert?.warning?.message, _messageBoxItems.notAllowedChangePermission.alert?.warning?.title, {
+            confirmButtonText: _messageBoxItems.notAllowedChangePermission.alert?.warning?.confirmButtonText,
+            type: _messageBoxItems.notAllowedChangePermission.alert?.warning?.type
         })
         return
     }

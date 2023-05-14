@@ -679,6 +679,16 @@ export const langStore = defineStore('menu', () => {
                         title: 'Error'
                     }
                 }
+            },
+            notAllowedChangePermission: {
+                alert: {
+                    warning: {
+                        type: 'warning',
+                        message: 'Modification of this user right is not allowed',
+                        confirmButtonText: 'OK',
+                        title: 'Warning'
+                    }
+                }
             }
         }
         if (lang === 'zh') {
@@ -728,6 +738,16 @@ export const langStore = defineStore('menu', () => {
                         warning: {
                             type: 'warning',
                             message: '没有删除该文档的权限',
+                            confirmButtonText: '好的',
+                            title: '警告'
+                        }
+                    }
+                },
+                notAllowedChangePermission: {
+                    alert: {
+                        warning: {
+                            type: 'warning',
+                            message: '不允许修改该用户权限',
                             confirmButtonText: '好的',
                             title: '警告'
                         }
