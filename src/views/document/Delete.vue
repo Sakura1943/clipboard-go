@@ -143,7 +143,7 @@ onMounted(() => {
                     </template>
                 </el-table-column>
             </el-table>
-            <el-table class="table" v-else>
+            <el-table class="table" :data="singlePageData" stripe v-else>
                 <el-table-column prop="id" :label="_tableItems.document.delete.id" />
                 <el-table-column prop="path" :label="_tableItems.document.delete.path" />
                 <el-table-column prop="user_name" :label="_tableItems.document.delete.upload_user" />
