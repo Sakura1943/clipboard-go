@@ -6,7 +6,7 @@
 > 准备条件<br>
 
 Node >= 18.0.0<br>
-Go >= 1.16<br>
+Go >= 1.20<br>
 Python >= 3.6<br>
 
 
