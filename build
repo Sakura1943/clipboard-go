@@ -11,7 +11,7 @@ class Config(object):
     """配置类"""
     def __init__(self, file_path):
         # 如果配置文件不存在，或者不是文件，则创建
-        if not os.path.exists(file_path) or not os.path.isfile(file_path):
+        if os.path.exists(file_path) == False or os.path.isfile(file_path) == False:
             init_config(file_path)
             exit()
         # 加载配置文件
@@ -70,7 +70,7 @@ def init_config(file_path):
     if str(frontend_port).strip() == '':
         frontend_port = 8080
     else:
-        frontend_host = int(server_port)
+        frontend_port = int(frontend_port)
     # 写入配置文件
     with open(file_path, "w") as f:
         f.write(f"""[base]
@@ -97,6 +97,7 @@ def run_command():
         frontend_build_tool = str(prompt('请输入构建工具(yarn,npm,pnpm): ')).strip()
         if frontend_build_tool != "npm" and frontend_build_tool != "pnpm" and frontend_build_tool != "yarn":
             sys.stderr.write('请输入三者其中之一\n')
+            exit()
         elif frontend_build_tool == "npm":
             subprocess.run("npm install", shell=True)
             subprocess.run("npm run build", shell=True)

@@ -1,0 +1,7 @@
+[base]
+allowed_origins = ["http://localhost:8080", "http://127.0.0.1:8080"]
+server_host = ""
+server_port = 8000
+gin_mode = "debug"
+frontend_host = "127.0.0.1"
+frontend_port = 8080

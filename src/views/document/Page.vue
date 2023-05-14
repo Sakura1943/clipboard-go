@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { langStore } from '@/stores/lang'
 import { documentStore } from '@/stores/document'
 import { ElMessageBox } from 'element-plus'
+// import hljs from 'highlight.js'
 
 // 获取当前语言
 const lang = localStorage.getItem('lang') === undefined ? 'en' : localStorage.getItem('lang') as string
@@ -46,7 +47,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <highlightjs :code="code"></highlightjs>
+    <highlightjs :code="code" />
 </template>
 
 <style scoped></style>

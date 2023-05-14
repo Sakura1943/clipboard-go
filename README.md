@@ -144,7 +144,7 @@ systemctl start clipboard-go.service
 
 ## 📖 使用
 ### 文件上传
-访问后端接口 `/api/user/login`， 输入表单数据`name`(用户名)， `password`(用户密码)登录，获取数据`JSON`数据中的`extra.token`字段，保存token。
+访问后端接口 `/api/login`， 输入表单数据`name`(用户名)， `password`(用户密码)登录，获取数据`JSON`数据中的`extra.token`字段，保存token。
 
 然后访问后端接口`/api/document/upload`， headers带`token`字段，form表单`file`参数为文件，获取返回的`JSON`数据的`extra.file-path`字段，然后访问前端界面即可获取内容`http(s)://前端地址/{extra.path}`。
 
@@ -153,7 +153,7 @@ systemctl start clipboard-go.service
 | 接口                   | 接口类型 | 描述                    | 使用方法                                         |
 | ---------------------- | -------- | ----------------------- | ------------------------------------------------ |
 | `/api/document/upload` | `POST`   | 文件上传                | 传入文件表单参数`file`                           |
-| `/api/user/login`      | `POST`   | 用户登录，以获取`token` | 传入form表单数据`name`(用户名), `password`(密码) |
+| `/api/login`      | `POST`   | 用户登录，以获取`token` | 传入form表单数据`name`(用户名), `password`(密码) |
 
 ## License
 The MIT License ([MIT](https://opensource.org/licenses/MIT))
