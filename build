@@ -35,6 +35,7 @@ class Config(object):
             exit()
         if self.frontend_port == None:
             sys.stderr.write('请给base.frontend_port赋值\n')
+            exit()
         # 如果前端地址不在base.frontend_port中，则报错
         if ((f'http://{self.frontend_host}:{self.frontend_port}' not in self.allowed_origins)
             and (f'https://{self.frontend_host}:{self.frontend_port}' not in self.allowed_origins)
