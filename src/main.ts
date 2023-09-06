@@ -6,7 +6,7 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 import 'highlight.js/lib/common';
 import 'highlight.js/styles/atom-one-dark-reasonable.css'
 import HljsPlugin from '@highlightjs/vue-plugin'
-import zh_local from 'element-plus/lib/locale/lang/zh-cn'
+import zh_local from 'element-plus/dist/locale/zh-cn'
 import App from './App.vue'
 import router from './router'
 
